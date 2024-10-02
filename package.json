@@ -1,0 +1,23 @@
+{
+  "name": "ts-object-utils",
+  "version": "0.0.1",
+  "description": "Utility for objects writed with TS",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanIsayenko1/ts-object-utils.git"
+  },
+  "author": "IvanIsayenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IvanIsayenko1/ts-object-utils/issues"
+  },
+  "homepage": "https://github.com/IvanIsayenko1/ts-object-utils#readme",
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.6.2"
+  }
+}
