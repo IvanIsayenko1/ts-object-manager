@@ -16,6 +16,23 @@ npm i ts-object-manager
 
 All methods list
 - [isObject](#isObject)
+- [isPlainObject](#isPlainObject)
+- [isObjectEmpty](#isObjectEmpty)
+- [isObjectDeepEqual](#isObjectDeepEqual)
+- [isPropertyDefined](#isPropertyDefined)
+- [cloneObject](#cloneObject)
+- [getObjectDiffIterative](#getObjectDiffIterative)
+- [getAllObjectKeys](#getAllObjectKeys)
+- [removeEmptyObjects](#removeEmptyObjects)
+- [deleteEmptyKeys](#deleteEmptyKeys)
+- [removeKeysFromObject](#removeKeysFromObject)
+- [mergeTwoObjects](#mergeTwoObjects)
+- [omitKeysOfObject](#omitKeysOfObject)
+- [transformToFlattenObject](#transformToFlattenObject)
+- [transformToUnflattenObject](#transformToUnflattenObject)
+- [getNestedValueOfObject](#getNestedValueOfObject)
+- [deepFreezeObject](#deepFreezeObject)
+- [mapValuesObject](#mapValuesObject)
 
 ### <span id="isObject">isObject</span>
 
@@ -30,7 +47,7 @@ console.log(isObject(42)); // false
 
 ---
 
-### isPlainObject
+### <span id="isPlainObject">isPlainObject</span>
 
 Checks if the given value is a plain object.
 
@@ -43,7 +60,7 @@ console.log(isPlainObject(Object.create(null))); // true
 
 ---
 
-### isObjectEmpty
+### <span id="isObjectEmpty">isObjectEmpty</span>
 
 Checks if the given object is empty.
 
@@ -82,7 +99,7 @@ console.log(result3); // Output: false
 
 ---
 
-### isObjectDeepEqual
+### <span id="isObjectDeepEqual">isObjectDeepEqual</span>
 
 Performs a deep comparison between two values to determine if they are equivalent.
 
@@ -104,7 +121,7 @@ console.log(isObjectDeepEqual([1, 2, 3], [1, 2])); // false
 
 ---
 
-### isPropertyDefined
+### <span id="isPropertyDefined">isPropertyDefined</span>
 
 Checks if a property is defined on an object or any of its nested objects.
 
@@ -118,7 +135,7 @@ console.log(isPropertyDefined(sample, 'b.c')); // true
 
 ---
 
-### cloneObject
+### <span id="cloneObject">cloneObject</span>
 
 Creates a deep clone of the given object.
 
@@ -132,7 +149,7 @@ console.log(cloned.b === original.b); // false
 
 ---
 
-### getObjectDiffIterative
+### <span id="getObjectDiffIterative">getObjectDiffIterative</span>
 
 Compares two objects or arrays iteratively and returns the differences between them.
 
@@ -198,7 +215,7 @@ console.log(diff);
 
 ---
 
-### getAllObjectKeys
+### <span id="getAllObjectKeys">getAllObjectKeys</span>
 
 Recursively retrieves all keys of a given object, including keys from nested objects.
 
@@ -219,7 +236,7 @@ console.log(keys);
 
 ---
 
-### removeEmptyObjects
+### <span id="removeEmptyObjects">removeEmptyObjects</span>
 
 Recursively removes empty objects and undefined values from an object or array.
 
@@ -257,7 +274,7 @@ console.log(cleanedArray);
 
 ---
 
-### deleteEmptyKeys
+### <span id="deleteEmptyKeys">deleteEmptyKeys</span>
 
 Recursively removes keys with undefined values from an object or array.
 
@@ -291,7 +308,7 @@ console.log(cleanedArray);
 
 ---
 
-### removeKeysFromObject
+### <span id="removeKeysFromObject">removeKeysFromObject</span>
 
 Recursively removes specified keys from an object or array.
 
@@ -324,7 +341,7 @@ console.log(cleanedArray);
 
 ---
 
-### mergeTwoObjects
+### <span id="mergeTwoObjects">mergeTwoObjects</span>
 
 Merges two objects into one, combining their properties.
 
@@ -361,7 +378,7 @@ console.log(result);
 
 ---
 
-### omitKeysOfObject
+### <span id="omitKeysOfObject">omitKeysOfObject</span>
 
 Creates a new object by omitting specified keys from the input object.
 
@@ -392,7 +409,7 @@ console.log(result);
 
 ---
 
-### transformToFlattenObject
+### <span id="transformToFlattenObject">transformToFlattenObject</span>
 
 Transforms a nested object into a flattened object. It converts all nested properties into a single level by concatenating their keys with a dot (.) separator.
 
@@ -437,7 +454,7 @@ console.log(result);
 
 ---
 
-### transformToUnflattenObject
+### <span id="transformToUnflattenObject">transformToUnflattenObject</span>
 
 Converts a flattened object back into a nested object structure. It reconstructs the original object by splitting keys that are concatenated with a dot (.) separator.
 
@@ -492,7 +509,7 @@ console.log(result);
 
 ---
 
-### getNestedValueOfObject
+### <span id="getNestedValueOfObject">getNestedValueOfObject</span>
 
 Retrieves a nested property value from an object using a dot-separated path.
 
@@ -520,7 +537,7 @@ console.log(missingProperty);
 
 ---
 
-### deepFreezeObject
+### <span id="deepFreezeObject">deepFreezeObject</span>
 
 Deep freezes an object, preventing any changes to its properties and nested objects.
 
@@ -532,7 +549,7 @@ frozenObj.b.c = 3; // TypeError: Cannot assign to read only property 'c' of obje
 
 ---
 
-### mapValuesObject
+### <span id="mapValuesObject">mapValuesObject</span>
 
 Maps the values of an object to a new object using a provided mapping function.
 
