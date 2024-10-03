@@ -13,7 +13,7 @@
  * console.log(isObject([])); // true
  * console.log(isObject(42)); // false
  */
-const isObject = <T>(obj: T): boolean =>
+export const isObject = <T>(obj: T): boolean =>
   typeof obj === "object" && obj !== null;
 
 /**
@@ -191,6 +191,16 @@ export const cloneObject = <T>(obj: T): T => {
  * @param {T} obj2 - The second object or array to compare.
  * @returns {any | undefined} - An object or array representing the differences,
  *                              or `undefined` if there are no differences.
+ * @example
+ * const objA = { a: 1, b: { c: 2 } };
+ * const objB = { a: 1, b: { c: 3 } };
+ * const diff = getObjectDiffIterative(objA, objB);
+ * console.log(diff); // { b: { c: 3 } }
+ *
+ * const arrA = [1, 2, 3];
+ * const arrB = [1, 2, 4];
+ * const diff = getObjectDiffIterative(arrA, arrB);
+ * console.log(diff); // [3, 4]
  */
 export const getObjectDiffIterative = (obj1: any, obj2: any): any => {
   const stack: Array<{ obj1: any; obj2: any; diff: any; key?: string }> = [
