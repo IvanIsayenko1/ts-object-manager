@@ -14,7 +14,10 @@ npm i ts-object-manager
 
 ## 📄 Documentation
 
-### isObject
+All methods list
+- [isObject](#isObject)
+
+### <span id="isObject">isObject</span>
 
 Checks if the given value is an object.
 
