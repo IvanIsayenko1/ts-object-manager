@@ -15,16 +15,18 @@ npm i ts-object-manager
 ## 📄 Documentation
 
 All methods list
+
 - [isObject](#isObject)
 - [isPlainObject](#isPlainObject)
 - [isObjectEmpty](#isObjectEmpty)
 - [isObjectDeepEqual](#isObjectDeepEqual)
 - [isPropertyDefined](#isPropertyDefined)
+- [isObjectHasTheStructure](#isObjectHasTheStructure)
 - [cloneObject](#cloneObject)
 - [getObjectDiffIterative](#getObjectDiffIterative)
 - [getAllObjectKeys](#getAllObjectKeys)
 - [removeEmptyObjects](#removeEmptyObjects)
-- [deleteEmptyKeys](#deleteEmptyKeys)
+- [removeUndefinedKeys](#removeUndefinedKeys)
 - [removeKeysFromObject](#removeKeysFromObject)
 - [mergeTwoObjects](#mergeTwoObjects)
 - [omitKeysOfObject](#omitKeysOfObject)
@@ -131,6 +133,24 @@ console.log(isPropertyDefined(sample, 'a')); // true
 console.log(isPropertyDefined(sample, 'b')); // true
 console.log(isPropertyDefined(sample, 'c')); // false
 console.log(isPropertyDefined(sample, 'b.c')); // true
+```
+
+---
+
+### <span id="isObjectHasTheStructure">isObjectHasTheStructure</span>
+
+Checks if the given object has the same structure as the specified structure object.
+
+```
+const obj1 = { name: "Alice", age: 30, address: { city: "Wonderland" } };
+const structure1 = { name: "", age: 0, address: { city: "" } };
+console.log(isObjectHasTheStructure(obj1, structure1)); // Output: true
+```
+
+```
+const obj2 = [ { name: "Bob" }, { name: "Charlie" } ];
+const structure2 = [ { name: "" }, { name: "" } ];
+console.log(isObjectHasTheStructure(obj2, structure2)); // Output: true
 ```
 
 ---
@@ -274,7 +294,7 @@ console.log(cleanedArray);
 
 ---
 
-### <span id="deleteEmptyKeys">deleteEmptyKeys</span>
+### <span id="removeUndefinedKeys">removeUndefinedKeys</span>
 
 Recursively removes keys with undefined values from an object or array.
 

@@ -32,8 +32,18 @@ export const isObject = <T>(obj: T): boolean =>
  * console.log(isPlainObject([])); // false
  * console.log(isPlainObject(Object.create(null))); // true
  */
-export const isPlainObject = <T>(obj: T): boolean =>
-  isObject(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+export const isPlainObject = <T>(obj: T): boolean => {
+  // Check if it's an object and not null
+  if (!isObject(obj)) {
+    return false;
+  }
+
+  // Check if it is a plain object created by Object or an empty prototype object
+  return (
+    Object.getPrototypeOf(obj) === Object.prototype ||
+    Object.getPrototypeOf(obj) === null // Check for objects created with Object.create(null)
+  );
+};
 
 /**
  * Checks if the given object is empty.
@@ -88,17 +98,29 @@ export const isObjectEmpty = <T>(obj: T): boolean => {
  * console.log(isObjectDeepEqual([1, 2, 3], [1, 2])); // false
  */
 export const isObjectDeepEqual = <T>(obj1: T, obj2: T): boolean => {
+  // If types are different, return false
   if (typeof obj1 !== typeof obj2) {
     return false;
   }
 
+  // Check if both values are objects and not null
   if (
     typeof obj1 === "object" &&
     typeof obj2 === "object" &&
     obj1 !== null &&
     obj2 !== null
   ) {
-    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    // Distinguish between arrays and objects
+    const isObj1Array = Array.isArray(obj1);
+    const isObj2Array = Array.isArray(obj2);
+
+    // If one is an array and the other is not, return false
+    if (isObj1Array !== isObj2Array) {
+      return false;
+    }
+
+    // If both are arrays, compare their lengths and elements
+    if (isObj1Array && isObj2Array) {
       if (obj1.length !== obj2.length) {
         return false;
       }
@@ -108,22 +130,27 @@ export const isObjectDeepEqual = <T>(obj1: T, obj2: T): boolean => {
         }
       }
       return true;
-    } else {
-      const keys1 = Object.keys(obj1);
-      const keys2 = Object.keys(obj2);
-      if (keys1.length !== keys2.length) {
+    }
+
+    // If both are objects, compare their keys and values
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    for (const key of keys1) {
+      if (!isObjectDeepEqual((obj1 as any)[key], (obj2 as any)[key])) {
         return false;
       }
-      for (const key of keys1) {
-        if (!isObjectDeepEqual((obj1 as any)[key], (obj2 as any)[key])) {
-          return false;
-        }
-      }
-      return true;
     }
-  } else {
-    return obj1 === obj2;
+
+    return true;
   }
+
+  // For primitive types, directly compare values
+  return obj1 === obj2;
 };
 
 /**
@@ -179,7 +206,37 @@ export const isPropertyDefined = <T>(
  * console.log(cloned.b === original.b); // false
  */
 export const cloneObject = <T>(obj: T): T => {
-  return JSON.parse(JSON.stringify(obj)) as T;
+  // A WeakMap to keep track of already cloned objects to handle circular references
+  const clonedObjects = new WeakMap<any, any>();
+
+  const clone = (input: any): any => {
+    // Check if the input is a primitive type or null
+    if (input === null || typeof input !== "object") {
+      return input; // Return the primitive value as is
+    }
+
+    // Handle circular references using WeakMap
+    if (clonedObjects.has(input)) {
+      return clonedObjects.get(input); // Return the existing clone
+    }
+
+    // Create an array or object based on the input type
+    const output = Array.isArray(input) ? [] : {};
+
+    // Store the reference of the original object in the WeakMap
+    clonedObjects.set(input, output);
+
+    // Recursively clone the properties
+    for (const key in input) {
+      if (input.hasOwnProperty(key)) {
+        (output as any)[key] = clone(input[key]); // Recursion for nested objects
+      }
+    }
+
+    return output; // Return the cloned object/array
+  };
+
+  return clone(obj); // Start cloning the original object
 };
 /**
  * Compares two objects or arrays iteratively and returns the differences between them.
@@ -189,8 +246,8 @@ export const cloneObject = <T>(obj: T): T => {
  *
  * @param {T} obj1 - The first object or array to compare.
  * @param {T} obj2 - The second object or array to compare.
- * @returns {any | undefined} - An object or array representing the differences,
- *                              or `undefined` if there are no differences.
+ * @returns {any} - An object or array representing the differences.
+ *
  * @example
  * const objA = { a: 1, b: { c: 2 } };
  * const objB = { a: 1, b: { c: 3 } };
@@ -202,55 +259,61 @@ export const cloneObject = <T>(obj: T): T => {
  * const diff = getObjectDiffIterative(arrA, arrB);
  * console.log(diff); // [3, 4]
  */
-export const getObjectDiffIterative = (obj1: any, obj2: any): any => {
-  const stack: Array<{ obj1: any; obj2: any; diff: any; key?: string }> = [
-    { obj1, obj2, diff: {} },
-  ];
+export const getObjectDiffIterative = (
+  objA: any,
+  objB: any,
+  visited = new WeakMap()
+): any => {
+  // Handle null values
+  if (objA === null && objB === null) return undefined;
+  if (objA === null) return { ...objB }; // All properties from objB
+  if (objB === null) return { ...objA }; // All properties from objA
 
-  while (stack.length > 0) {
-    const { obj1, obj2, diff, key } = stack.pop()!;
+  // Initialize a diff object to hold differences
+  const diff: Record<string, any> = {};
 
-    if (typeof obj1 !== typeof obj2) {
-      if (key) diff[key] = obj2;
-    } else if (typeof obj1 === "object" && obj1 !== null) {
-      if (Array.isArray(obj1)) {
-        if (obj1.length !== obj2.length) {
-          if (key) diff[key] = obj2;
-        } else {
-          const newArrayDiff: any[] = [];
-          for (let i = 0; i < obj1.length; i++) {
-            stack.push({ obj1: obj1[i], obj2: obj2[i], diff: newArrayDiff });
+  // Use Object.keys to get all unique keys from both objects
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
+  const allKeys = new Set([...keysA, ...keysB]); // Unique keys from both objects
+
+  for (const key of allKeys) {
+    const valueA = objA[key];
+    const valueB = objB[key];
+
+    // Handle added or removed properties
+    if (!(key in objA)) {
+      diff[key] = valueB; // Added property
+    } else if (!(key in objB)) {
+      diff[key] = undefined; // Removed property
+    } else if (valueA !== valueB) {
+      // If both properties exist, check for modifications
+      const isValueAObject = typeof valueA === "object" && valueA !== null;
+      const isValueBObject = typeof valueB === "object" && valueB !== null;
+
+      // Handle nested objects
+      if (isValueAObject && isValueBObject) {
+        // Check if circular reference
+        if (visited.has(valueA)) {
+          if (visited.get(valueA) === valueB) {
+            continue; // Skip circular reference comparison
           }
-          if (key && newArrayDiff.length > 0) diff[key] = newArrayDiff;
+        } else {
+          visited.set(valueA, valueB); // Mark valueA as visited
+        }
+
+        const nestedDiff = getObjectDiffIterative(valueA, valueB, visited);
+        if (Object.keys(nestedDiff).length > 0) {
+          diff[key] = nestedDiff; // Record nested differences
         }
       } else {
-        const newObjDiff: { [key: string]: any } = {};
-        const keys1 = Object.keys(obj1);
-        const keys2 = Object.keys(obj2);
-        if (keys1.length !== keys2.length) {
-          if (key) diff[key] = obj2;
-        } else {
-          for (const propKey of keys1) {
-            stack.push({
-              obj1: obj1[propKey],
-              obj2: obj2[propKey],
-              diff: newObjDiff,
-              key: propKey,
-            });
-          }
-          if (key && Object.keys(newObjDiff).length > 0) diff[key] = newObjDiff;
-        }
-      }
-    } else {
-      if (obj1 !== obj2 && key) {
-        diff[key] = obj2;
+        // If they are not equal and not objects, record the modification
+        diff[key] = valueB; // Modified property
       }
     }
   }
 
-  return Object.keys(stack[0]?.diff || {}).length > 0
-    ? stack[0].diff
-    : undefined;
+  return Object.keys(diff).length > 0 ? diff : {}; // Return differences
 };
 
 /**
@@ -276,13 +339,20 @@ export const getObjectDiffIterative = (obj1: any, obj2: any): any => {
  */
 export const getAllObjectKeys = <T>(
   obj: T,
-  parentKey: string = ""
+  parentKey: string = "",
+  visited = new WeakSet<any>()
 ): string[] => {
   let keys: string[] = [];
 
   // Check if the input is a plain object
   const isObject = (value: any): value is Record<string, any> =>
     value !== null && typeof value === "object" && !Array.isArray(value);
+
+  // If we've already visited this object, skip it to prevent circular reference issues
+  if (visited.has(obj)) {
+    return keys; // Return empty keys for circular references
+  }
+  visited.add(obj); // Mark this object as visited
 
   if (isObject(obj)) {
     for (const key in obj) {
@@ -291,7 +361,7 @@ export const getAllObjectKeys = <T>(
 
         // Use the isObject function to determine if obj[key] is a plain object
         if (isObject(obj[key])) {
-          keys = keys.concat(getAllObjectKeys(obj[key], fullKey)); // Recursively fetch keys from nested objects
+          keys = keys.concat(getAllObjectKeys(obj[key], fullKey, visited)); // Recursively fetch keys from nested objects
         } else {
           keys.push(fullKey); // Push the key if it's not an object
         }
@@ -396,28 +466,34 @@ export const removeEmptyObjects = <T>(obj: T): any => {
  * console.log(cleanedArray);
  * // Output: [ { id: 2, value: { name: "Test" } }, { id: 3, value: null } ]
  */
-export const deleteEmptyKeys = <T>(obj: T): any => {
+export const removeUndefinedKeys = <T>(obj: T): any => {
+  // If the input is not an object or is null, return it as is
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
 
+  // If it's an array, recursively process each element
   if (Array.isArray(obj)) {
-    return obj.map(deleteEmptyKeys);
+    const result = obj.filter((e) => e !== undefined).map(removeUndefinedKeys); // Process each item
+    return result; // Return the array, including empty ones
   }
 
   const newObj: any = {};
 
+  // Iterate through the object's keys
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
-      const value = deleteEmptyKeys(obj[key]);
+      const value = removeUndefinedKeys(obj[key]); // Recursively process the value
 
+      // Only add non-undefined values to the new object
       if (value !== undefined) {
         newObj[key] = value;
       }
     }
   }
 
-  return newObj;
+  // Return the new object, including empty objects
+  return newObj; // Always return the object, including if it's empty
 };
 
 /**
@@ -520,36 +596,38 @@ export const removeKeysFromObject = <T>(
  * console.log(result);
  * // Output: { x: 10, y: { z: 20, a: 30 } }
  */
-export const mergeTwoObjects = <T>(obj1: T, obj2: T): any => {
+export const mergeTwoObjects = <
+  T extends Record<string, any>,
+  U extends Record<string, any>
+>(
+  obj1: T,
+  obj2: U
+): any => {
   const mergedObj: any = {};
 
-  // check if props are objects
-  if (typeof obj1 !== "object" || obj1 === null) {
-    return undefined;
-  }
-
-  if (typeof obj2 !== "object" || obj2 === null) {
-    return undefined;
-  }
-
+  // Merge properties from the first object
   for (const key in obj1) {
     if (obj1.hasOwnProperty(key)) {
       if (obj2.hasOwnProperty(key)) {
-        if (typeof obj1[key] === "object" && obj1[key] !== null) {
-          mergedObj[key] = mergeTwoObjects(obj1[key], obj2[key]);
+        // Check if both properties are arrays
+        if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+          mergedObj[key] = [...obj1[key], ...obj2[key]]; // Concatenate arrays
+        } else if (typeof obj1[key] === "object" && obj1[key] !== null) {
+          mergedObj[key] = mergeTwoObjects(obj1[key], obj2[key]); // Merge nested objects
         } else {
-          mergedObj[key] = obj2[key];
+          mergedObj[key] = obj2[key]; // Use value from obj2
         }
       } else {
-        mergedObj[key] = obj1[key];
+        mergedObj[key] = obj1[key]; // Keep value from obj1
       }
     }
   }
 
+  // Add properties from the second object that are not in the first
   for (const key in obj2) {
     if (obj2.hasOwnProperty(key)) {
       if (!obj1.hasOwnProperty(key)) {
-        mergedObj[key] = obj2[key];
+        mergedObj[key] = obj2[key]; // Add new properties from obj2
       }
     }
   }
