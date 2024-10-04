@@ -310,7 +310,7 @@ const data = {
   g: null,
 };
 
-const cleanedData = deleteEmptyKeys(data);
+const cleanedData = removeEmptyKeys(data);
 console.log(cleanedData);
 // Output: { a: 1, c: { e: 3 }, f: [], g: null }
 ```
@@ -321,7 +321,7 @@ const arrayData = [
     { id: 2, value: { name: "Test" } },
     { id: 3, value: null },
   ];
-const cleanedArray = deleteEmptyKeys(arrayData);
+const cleanedArray = removeEmptyKeys(arrayData);
 console.log(cleanedArray);
 // Output: [ { id: 2, value: { name: "Test" } }, { id: 3, value: null } ]
 ```
