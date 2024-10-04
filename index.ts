@@ -641,7 +641,10 @@ export const mergeTwoObjects = <
  * console.log(result);
  * // Output: { x: 10, z: 30 }
  */
-export function omitKeysOfObject<T, K extends keyof T>(obj: T, keys: K[]): any {
+export const omitKeysOfObject = <T, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): any => {
   if (typeof obj !== "object" || obj === null) {
     return undefined;
   }
@@ -651,7 +654,7 @@ export function omitKeysOfObject<T, K extends keyof T>(obj: T, keys: K[]): any {
     delete result[key];
   });
   return result;
-}
+};
 
 /**
  * Transforms a nested object into a flattened object. It converts all nested properties
