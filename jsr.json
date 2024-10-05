@@ -2,5 +2,6 @@
   "name": "@ivis/ts-object-manager",
   "version": "1.0.0",
   "exports": "./index.ts",
+  "description": "Utility for objects writed with TS",
   "license": "ISC"
 }
