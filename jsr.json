@@ -1,0 +1,6 @@
+{
+  "name": "@ivis/ts-object-manager",
+  "version": "1.0.0",
+  "exports": "./index.ts",
+  "license": "ISC"
+}

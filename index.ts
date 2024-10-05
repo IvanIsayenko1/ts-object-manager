@@ -253,7 +253,7 @@ export const cloneObject = <T>(obj: T): T => {
 export const getObjectDiffIterative = (
   objA: any,
   objB: any,
-  visited = new WeakMap()
+  visited: WeakMap<any, any> = new WeakMap()
 ): any => {
   if (objA === null && objB === null) return undefined;
   if (objA === null) return { ...objB };
@@ -323,7 +323,7 @@ export const getObjectDiffIterative = (
 export const getAllObjectKeys = <T>(
   obj: T,
   parentKey: string = "",
-  visited = new WeakSet<any>()
+  visited: WeakSet<any> = new WeakSet<any>()
 ): string[] => {
   let keys: string[] = [];
 
